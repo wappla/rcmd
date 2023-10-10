@@ -1,0 +1,23 @@
+{
+    "name": "rcmd",
+    "version": "0.0.1",
+    "description": "Route commands",
+    "author": "Dashdot",
+    "license": "ISC",
+    "type": "module",
+    "exports": "./dist/index.js",
+    "bin": "./dist/cli.js",
+    "scripts": {
+        "dev": "tsup --watch",
+        "build": "tsup"
+    },
+    "dependencies": {
+        "arg": "^5.0.2",
+        "cosmiconfig": "^8.3.6"
+    },
+    "devDependencies": {
+        "@types/node": "^20.8.4",
+        "tsup": "^7.2.0",
+        "typescript": "^5.2.2"
+    }
+}
