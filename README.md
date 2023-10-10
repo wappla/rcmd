@@ -56,8 +56,7 @@ Define routes for example using next.js
 // /cmd/db/migrate/rollback/route.ts
 
 const spec = { '--step': Number }
-const command = new Command(spec, async (name, options) => {
-    const { step } = options
+const command = new Command(spec, async ({ step }) => {
     db.migrate.rollback({ step })
 })
 
