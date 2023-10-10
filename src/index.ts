@@ -44,6 +44,28 @@ export async function processCmdReq(
     }
 }
 
+export async function parseCmdReq(
+    req: Request,
+    spec: Spec,
+    cmd: (...args: any[]) => Promise<void>
+) {
+    return processCmdReq(req, async (argv) => {
+        const args = arg(spec, {
+            permissive: false,
+            argv: argv.slice(3),
+        })
+        const { _: actionArgs, ...options } = args
+        const actionOptions = Object.entries(options).reduce(
+            (acc: CommandOptions, [key, value]) => {
+                acc[key.replace('--', '')] = value
+                return acc
+            },
+            {}
+        )
+        await cmd(...actionArgs, actionOptions)
+    })
+}
+
 export class Command {
     _spec: Spec
     _action: (...args: any[]) => Promise<void>
@@ -51,7 +73,7 @@ export class Command {
         this._spec = spec
         this._action = action
     }
-    parse(req: Request) {
+    async parse(req: Request): Promise<ProcessResult> {
         if (this._action !== null && this._spec !== null) {
             return processCmdReq(req, async (argv) => {
                 const args = arg(this._spec, {
@@ -69,5 +91,6 @@ export class Command {
                 await this._action(...actionArgs, actionOptions)
             })
         }
+        return { status: 500, body: { success: false } }
     }
 }
