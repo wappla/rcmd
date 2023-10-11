@@ -25,11 +25,21 @@ export async function main(argv: string[]) {
     )
     if (result.status === 200) {
         const body = await result.json()
-        consola.success(body)
+        consola.success({
+            message: 'Successfully executed command.',
+            additional: JSON.stringify(body.result, null, 4),
+        })
     }
     if (result.status === 500 || result.status === 401) {
         const body = await result.json()
-        consola.error(body)
+        consola.error({
+            message: 'Failed to executed command.',
+            additional: JSON.stringify(body.error, null, 4),
+        })
+    }
+    if (result.status === 401) {
+        const body = await result.json()
+        consola.error('Unauthorized')
     }
 }
 

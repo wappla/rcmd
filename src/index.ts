@@ -43,7 +43,13 @@ export async function processCmdReq(
             status: 200,
             body: { success: true, result },
         }
-    } catch (error) {
+    } catch (e: any) {
+        const error = {
+            message: e.message,
+            stack: e.stack,
+            name: e.name,
+            cause: e.cause,
+        }
         return {
             status: 500,
             body: { success: false, error },
