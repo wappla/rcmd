@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+import { consola } from 'consola'
 import { cosmiconfig } from 'cosmiconfig'
 
 export async function main(argv: string[]) {
@@ -22,7 +23,14 @@ export async function main(argv: string[]) {
         `${envHost}/${basePath}/${path}?argv=${finalArgv.join(' ')}`,
         { headers: { authorization: `Bearer ${process.env.RCMD_SECRET}` } }
     )
-    const body = await result.json()
+    if (result.status === 200) {
+        const body = await result.json()
+        consola.success(body)
+    }
+    if (result.status === 500 || result.status === 401) {
+        const body = await result.json()
+        consola.error(body)
+    }
 }
 
 main(process.argv)
