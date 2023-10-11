@@ -37,7 +37,7 @@ npx rcmd db/migrate/latest --production --force
 async function rcmd() {
     await fetch(`${environment}/${route}?argv=${process.argv.join(' ')}`)
 }
-// import { parseCmdReq } from 'rcmd'
+// req handler util
 async function parseCmdReq(req, spec, cmd) {
     const argv = new URL(req.url).searchParams.get('argv')
     const args = praseArgv(argv, spec)
@@ -57,7 +57,7 @@ Config inside `.rcmdrc` or [other formats ](https://github.com/cosmiconfig/cosmi
 
 ```json
 {
-    "envSecret": "RCMD_SECRET",
+    "envSecretKey": "RCMD_SECRET",
     "basePath": "/cmd",
     "envs": {
         "local": "http://localhost:3000",
