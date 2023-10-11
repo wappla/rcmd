@@ -4,17 +4,16 @@ type ProcessResult = {
     status: number;
     body: any;
 };
+type ParseArgvResult = {
+    args: string[];
+    options: CommandOptions;
+};
 type CommandOptions = {
     [key: string]: any;
 };
 declare function parseCmdUrl(url: string): string[];
-declare function processCmdReq(req: Request, parse: (argv: string[]) => Promise<void>): Promise<ProcessResult>;
-declare function parseCmdReq(req: Request, spec: Spec, cmd: (...args: any[]) => Promise<void>): Promise<ProcessResult>;
-declare class Command {
-    _spec: Spec;
-    _action: (...args: any[]) => Promise<void>;
-    constructor(spec: Spec, action: (...args: any[]) => Promise<void>);
-    parse(req: Request): Promise<ProcessResult>;
-}
+declare function processCmdReq(req: Request, parse: (argv: string[]) => ParseArgvResult, cmd: (...args: any[]) => Promise<any>): Promise<ProcessResult>;
+declare function parseArgv(argv: string[], spec: Spec): ParseArgvResult;
+declare function parseCmdReq(req: Request, spec: Spec, cmd: (...args: any[]) => Promise<any>): Promise<ProcessResult>;
 
-export { Command, CommandOptions, ProcessResult, parseCmdReq, parseCmdUrl, processCmdReq };
+export { CommandOptions, ParseArgvResult, ProcessResult, parseArgv, parseCmdReq, parseCmdUrl, processCmdReq };

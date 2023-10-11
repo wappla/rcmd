@@ -5,6 +5,11 @@ export type ProcessResult = {
     body: any
 }
 
+export type ParseArgvResult = {
+    args: string[]
+    options: CommandOptions
+}
+
 export type CommandOptions = {
     [key: string]: any
 }
@@ -20,7 +25,8 @@ export function parseCmdUrl(url: string) {
 
 export async function processCmdReq(
     req: Request,
-    parse: (argv: string[]) => Promise<void>
+    parse: (argv: string[]) => ParseArgvResult,
+    cmd: (...args: any[]) => Promise<any>
 ): Promise<ProcessResult> {
     const authHeader = req.headers.get('authorization')
     if (authHeader !== `Bearer ${process.env.RCMD_SECRET}`) {
@@ -31,10 +37,11 @@ export async function processCmdReq(
     }
     try {
         const argv = parseCmdUrl(req.url)
-        await parse(argv)
+        const { args, options } = parse(argv)
+        const result = await cmd(...args, options)
         return {
             status: 200,
-            body: { success: true },
+            body: { success: true, result },
         }
     } catch (error) {
         return {
@@ -44,53 +51,26 @@ export async function processCmdReq(
     }
 }
 
+export function parseArgv(argv: string[], spec: Spec): ParseArgvResult {
+    const result = arg(spec, {
+        permissive: false,
+        argv: argv.slice(3),
+    })
+    const { _: args, ...rest } = result
+    const options = Object.entries(rest).reduce(
+        (acc: CommandOptions, [key, value]) => {
+            acc[key.replace('--', '')] = value
+            return acc
+        },
+        {}
+    )
+    return { args, options }
+}
+
 export async function parseCmdReq(
     req: Request,
     spec: Spec,
-    cmd: (...args: any[]) => Promise<void>
+    cmd: (...args: any[]) => Promise<any>
 ) {
-    return processCmdReq(req, async (argv) => {
-        const args = arg(spec, {
-            permissive: false,
-            argv: argv.slice(3),
-        })
-        const { _: actionArgs, ...options } = args
-        const actionOptions = Object.entries(options).reduce(
-            (acc: CommandOptions, [key, value]) => {
-                acc[key.replace('--', '')] = value
-                return acc
-            },
-            {}
-        )
-        await cmd(...actionArgs, actionOptions)
-    })
-}
-
-export class Command {
-    _spec: Spec
-    _action: (...args: any[]) => Promise<void>
-    constructor(spec: Spec, action: (...args: any[]) => Promise<void>) {
-        this._spec = spec
-        this._action = action
-    }
-    async parse(req: Request): Promise<ProcessResult> {
-        if (this._action !== null && this._spec !== null) {
-            return processCmdReq(req, async (argv) => {
-                const args = arg(this._spec, {
-                    permissive: false,
-                    argv: argv.slice(3),
-                })
-                const { _: actionArgs, ...options } = args
-                const actionOptions = Object.entries(options).reduce(
-                    (acc: CommandOptions, [key, value]) => {
-                        acc[key.replace('--', '')] = value
-                        return acc
-                    },
-                    {}
-                )
-                await this._action(...actionArgs, actionOptions)
-            })
-        }
-        return { status: 500, body: { success: false } }
-    }
+    return processCmdReq(req, (argv: string[]) => parseArgv(argv, spec), cmd)
 }

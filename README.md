@@ -162,7 +162,7 @@ export async function GET(req) {
         .action(({ step }) => {
             db.migrate.rollback({ step })
         })
-    program.parse(argv)
+    program.parse(argv.split(' '))
 }
 ```
 
