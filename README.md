@@ -1,5 +1,8 @@
 # rcmd
 
+[![build](https://img.shields.io/github/actions/workflow/status/wappla/rcmd/on_push_main.yml?style=flat&colorA=000000&colorB=000000)](https://github.com/wappla/rcmd/actions/workflows/on_push_main.yml)
+[![codecov](https://img.shields.io/codecov/c/github/wappla/rcmd?style=flat&colorA=000000&colorB=000000)](https://codecov.io/gh/wappla/rcmd)
+
 Route command (rcmd) helps you execute commands locally or on remote environments using api routes.
 
 ## Usage
@@ -51,13 +54,14 @@ The CLI will simply send the `process.argv` as a query param to a url. The req h
 
 Commands are a useful tool for developers to perform technical operations via the CLI on a local or remote environment. However, executing commands on serverless environments can be challenging since there is no physical machine to run the commands on. Additionally, when commands depend on environment secrets (such as database operations), sharing these secrets with the remote environment and the machine executing the command can be a difficult problem. By using `rcmd`, you can overcome these problems by simply exposing API routes that correspond to the commands you want to execute.
 
+Exposing technical API routes like that obviously comes with some security concerns. `rcmd` provides simple tools to secure those endpoints and make sure not malicious users can access them.
+
 ## Config
 
 Config inside `.rcmdrc` or [other formats ](https://github.com/cosmiconfig/cosmiconfig)
 
 ```json
 {
-    "envSecretKey": "RCMD_SECRET",
     "basePath": "/cmd",
     "envs": {
         "local": "http://localhost:3000",
