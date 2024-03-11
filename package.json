@@ -1,5 +1,5 @@
 {
-    "name": "rcmd",
+    "name": "@dashdot/rcmd",
     "version": "0.0.1",
     "description": "Route commands",
     "author": "Dashdot",
